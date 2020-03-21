@@ -1,6 +1,6 @@
 import requests
 import json
-from hubdbutil.constants import (
+from hubdbapi.constants import (
     hubdb_publish_table_url_template,
     hubdb_get_all_tables_url_template,
     hubdb_delete_table_url_template,

@@ -1,8 +1,5 @@
 import unittest
-import copy
-import requests
-import json
-from hubdbutil.table_functions import (
+from hubdbapi.table_functions import (
     publish_table,
     get_table_id,
     delete_table,
