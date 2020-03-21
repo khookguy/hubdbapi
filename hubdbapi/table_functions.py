@@ -16,8 +16,8 @@ def get_table_column_name_to_id_map(table_id, portal_id):
     name_to_id_map = {}
     for col in table_details.get("columns"):
         name = col["name"]
-        id = col["id"]
-        name_to_id_map[name] = id
+        col_id = col["id"]
+        name_to_id_map[name] = col_id
     return name_to_id_map
 
 
@@ -61,7 +61,7 @@ def get_table_id(table_name, hs_key):
         return None
     table_id = None
     for table in all_tables["objects"]:
-        if (table_name == table.get("name")):
+        if table_name == table.get("name"):
             table_id = table.get("id")
             break
     return table_id
