@@ -20,6 +20,13 @@ def get_table_column_name_to_id_map(table_id, portal_id):
         name_to_id_map[name] = col_id
     return name_to_id_map
 
+# FIXME: needs paging to handle cases where table has more than 1000 rows
+def get_all_rows_from_table(table_id, portal_id):
+    hubdb_get_all_rows_from_table_url = hubdb_get_all_rows_from_table_url_template.format(
+        **{'table_id': table_id, 'portal_id': portal_id})
+    resp = requests.get(hubdb_get_all_rows_from_table_url, headers={})
+    resp.raise_for_status()
+    return resp.json().get("objects")
 
 def get_row_from_table(row_id, table_id, portal_id):
     hubdb_get_all_rows_from_table_url = hubdb_get_all_rows_from_table_url_template.format(

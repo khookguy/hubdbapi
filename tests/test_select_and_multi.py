@@ -11,7 +11,7 @@ from hubdbapi.table_functions import (
 )
 from tests.config import (
     hs_portalid,
-    hs_key,
+    hs_key
 )
 
 select_table_name = "select_test"
