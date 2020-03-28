@@ -2,13 +2,13 @@ from distutils.core import setup
 setup(
   name = 'hubdbapi',
   packages = ['hubdbapi'],
-  version = '0.2',
+  version = '0.3',
   license='agpl-3.0',
   description = 'Python utilities for integrating with the HubDB API.',
   author = 'Mark Hansen',
   author_email = 'mark@rarekarma.com',
   url = 'https://github.com/khookguy/hubdbapi',
-  download_url = 'https://github.com/khookguy/hubdbapi/archive/v0.2.tar.gz',
+  download_url = 'https://github.com/khookguy/hubdbapi/archive/v0.3.tar.gz',
   keywords = ['HubSpot', 'HubDB', 'API'],
   install_requires=[
       ],
