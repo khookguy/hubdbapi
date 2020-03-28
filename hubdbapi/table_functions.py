@@ -9,13 +9,14 @@ from hubdbapi.constants import (
     hubdb_create_table_url_template,
     hubdb_get_table_details_url_template,
     hubdb_add_row_to_table_url_template,
-hubdb_update_table_row_url_template,
+    hubdb_update_table_row_url_template,
     hubdb_get_all_rows_from_table_url_template
 )
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 logger.addHandler(handler)
+
 
 def get_table_column_name_to_id_map(table_id, portal_id):
     table_details = get_table_details(table_id, portal_id)
@@ -25,6 +26,7 @@ def get_table_column_name_to_id_map(table_id, portal_id):
         col_id = col["id"]
         name_to_id_map[name] = col_id
     return name_to_id_map
+
 
 # FIXME: needs paging to handle cases where table has more than 1000 rows
 def get_all_rows_from_table(table_id, portal_id):
@@ -57,8 +59,8 @@ def add_row_to_table(row, table_id, hs_key):
     hubdb_add_row_to_table_url = hubdb_add_row_to_table_url_template.format(**{'table_id': table_id, 'hs_key': hs_key})
     try:
         resp = requests.post(hubdb_add_row_to_table_url,
-                         headers={"content-type": "application/json"},
-                         data=json.dumps(row))
+                             headers={"content-type": "application/json"},
+                             data=json.dumps(row))
 
         resp.raise_for_status()
     except requests.exceptions.HTTPError as he:
@@ -85,8 +87,8 @@ def update_row_in_table(update_request_data, row_id, table_id, hs_key):
     )
     try:
         resp = requests.put(hubdb_update_table_row_url,
-                         headers={"content-type": "application/json"},
-                         data=json.dumps(update_request_data))
+                            headers={"content-type": "application/json"},
+                            data=json.dumps(update_request_data))
         resp.raise_for_status()
     except requests.exceptions.HTTPError as he:
         logger.exception("HTTP Error: {}  Message: {}\nRequest was: {}".
