@@ -10,7 +10,8 @@ from hubdbapi.constants import (
     hubdb_get_table_details_url_template,
     hubdb_add_row_to_table_url_template,
     hubdb_update_table_row_url_template,
-    hubdb_get_all_rows_from_table_url_template
+    hubdb_get_all_rows_from_table_url_template,
+    hubdb_update_table_row_cell_template
 )
 
 logger = logging.getLogger(__name__)
@@ -28,11 +29,19 @@ def get_table_column_name_to_id_map(table_id, portal_id):
     return name_to_id_map
 
 
-# FIXME: needs paging to handle cases where table has more than 1000 rows
 def get_all_rows_from_table(table_id, portal_id):
+    return get_rows_from_table(table_id, portal_id)
+
+
+# FIXME: needs paging to handle cases where result has more than 1000 rows
+def get_rows_from_table(table_id, portal_id, filter=None):
     hubdb_get_all_rows_from_table_url = hubdb_get_all_rows_from_table_url_template.format(
         **{'table_id': table_id, 'portal_id': portal_id})
-    resp = requests.get(hubdb_get_all_rows_from_table_url, headers={})
+    if filter:
+        get_rows_url = hubdb_get_all_rows_from_table_url + "&" +  filter
+    else:
+        get_rows_url = hubdb_get_all_rows_from_table_url
+    resp = requests.get(get_rows_url, headers={})
     resp.raise_for_status()
     return resp.json().get("objects")
 
@@ -66,11 +75,11 @@ def add_row_to_table(row, table_id, hs_key):
     except requests.exceptions.HTTPError as he:
         logger.exception("HTTP Error: {}  Message: {}\nRequest was: {}".
                          format(he.response.status_code,
-                                he.response.json()['message'],
+                                he.response.text,
                                 json.dumps(json.loads(he.request.body), indent=2)))
         raise
     except requests.exceptions.RequestException as e:
-        logger.exception("RequestExeption from request: {}".format(e.request.body))
+        logger.exception("RequestExeption from request: {}\n with response: {}".format(e.request.body, resp.text))
         raise
     return resp.json()
 
@@ -93,21 +102,50 @@ def update_row_in_table(update_request_data, row_id, table_id, hs_key):
     except requests.exceptions.HTTPError as he:
         logger.exception("HTTP Error: {}  Message: {}\nRequest was: {}".
                          format(he.response.status_code,
-                                he.response.json()['message'],
+                                he.response.text,
                                 json.dumps(json.loads(he.request.body), indent=2)))
         raise
     except requests.exceptions.RequestException as e:
-        logger.exception("RequestExeption from request: {}".format(e.request.body))
+        logger.exception("RequestExeption from request: {}\n with response: {}".format(e.request.body, resp.text))
+        raise
+    return resp.json()
+
+def update_row_cell_in_table(cell_value, cell_num, row_id, table_id, hs_key):
+    hubdb_update_table_row_cell = hubdb_update_table_row_cell_template.format(
+        **{'row_id': row_id, 'table_id': table_id, 'cell_num': cell_num, 'hs_key': hs_key})
+    try:
+        resp = requests.put(hubdb_update_table_row_cell,
+                            headers={"content-type": "application/json"},
+                            data=json.dumps({"value": cell_value}))
+        resp.raise_for_status()
+    except requests.exceptions.HTTPError as he:
+        logger.exception("HTTP Error: {}  Message: {}\nRequest was: {}".
+                         format(he.response.status_code,
+                                he.response.text,
+                                json.dumps(json.loads(he.request.body), indent=2)))
+        raise
+    except requests.exceptions.RequestException as e:
+        logger.exception("RequestExeption from request: {}\n with response: {}".format(e.request.body, resp.text))
         raise
     return resp.json()
 
 
 def create_table(table_definition, hs_key):
     hubdb_create_table_url = hubdb_create_table_url_template.format(**{'hs_key': hs_key})
-    resp = requests.post(hubdb_create_table_url,
-                         headers={"content-type": "application/json"},
-                         data=json.dumps(table_definition))
-    resp.raise_for_status()
+    try:
+        resp = requests.post(hubdb_create_table_url,
+                             headers={"content-type": "application/json"},
+                             data=json.dumps(table_definition))
+        resp.raise_for_status()
+    except requests.exceptions.HTTPError as he:
+        logger.exception("HTTP Error: {}  Message: {}\nRequest was: {}".
+                         format(he.response.status_code,
+                                he.response.text,
+                                json.dumps(json.loads(he.request.body), indent=2)))
+        raise
+    except requests.exceptions.RequestException as e:
+        logger.exception("RequestExeption from request: {}\n with response: {}".format(e.request.body, resp.text))
+        raise
     return resp.json()
 
 
@@ -159,10 +197,10 @@ def publish_table(table_id, hs_key):
     except requests.exceptions.HTTPError as he:
         logger.exception("HTTP Error: {}  Message: {}\nRequest was: {}".
                          format(he.response.status_code,
-                                he.response.json()['message'],
+                                he.response.text,
                                 json.dumps(json.loads(he.request.body), indent=2)))
         raise
     except requests.exceptions.RequestException as e:
-        logger.exception("RequestExeption from request: {}".format(e.request.body))
+        logger.exception("RequestExeption from request: {}\n with response: {}".format(e.request.body, resp.text))
         raise
     return resp.json()
