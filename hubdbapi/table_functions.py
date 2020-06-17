@@ -1,3 +1,4 @@
+from typing import Dict
 import requests
 import json
 import logging
@@ -19,12 +20,12 @@ logger.setLevel(logging.DEBUG)
 logger.addHandler(handler)
 
 
-def get_table_column_name_to_id_map(table_id, portal_id):
+def get_table_column_name_to_id_map(table_id, portal_id) -> Dict[str, int]:
     table_details = get_table_details(table_id, portal_id)
     name_to_id_map = {}
     for col in table_details.get("columns"):
-        name = col["name"]
-        col_id = col["id"]
+        name: str = col["name"]
+        col_id: int = col["id"]
         name_to_id_map[name] = col_id
     return name_to_id_map
 
@@ -153,7 +154,7 @@ def create_and_publish_table(table_definition, hs_key):
     return publish_table(create_table(table_definition, hs_key)["id"], hs_key)
 
 
-def get_table_id(table_name, hs_key):
+def get_table_id(table_name: str, hs_key: str) -> int:
     all_tables = get_all_tables(hs_key)
     if all_tables.get("objects") is None:
         return None
@@ -180,7 +181,7 @@ def get_table_details(table_id, portal_id):
     return resp.json()
 
 
-def get_all_tables(hs_key):
+def get_all_tables(hs_key:str) -> dict:
     hubdb_get_all_tables_url = hubdb_get_all_tables_url_template.format(**{'hs_key': hs_key})
     resp = requests.get(hubdb_get_all_tables_url, headers={})
     resp.raise_for_status()
